@@ -1,4 +1,4 @@
-//Factorial
+Ôªø//Factorial
 #include<iostream>
 
 using std::cin;
@@ -13,14 +13,14 @@ void main()
 	setlocale(LC_ALL, "");
 	
 	int n;
-	cout << "¬‚Â‰ËÚÂ ˆÂÎÓÂ ˜ËÒÎÓ, Ù‡ÍÚÓË‡Î ÍÓÚÓÓ„Ó ÌÂÓ·ıÓ‰ËÏÓ ‚˚˜ËÒÎËÚ¸: "; cin >> n;
+	cout << "–í–≤–µ–¥–∏—Ç–µ —Ü–µ–ª–æ–µ —á–∏—Å–ª–æ, —Ñ–∞–∫—Ç–æ—Ä–∏–∞–ª –∫–æ—Ç–æ—Ä–æ–≥–æ –Ω–µ–æ–±—Ö–æ–¥–∏–º–æ –≤—ã—á–∏—Å–ª–∏—Ç—å: "; cin >> n;
 	try
 	{
 	cout << n << "! = " << Factorial(n) << endl;
 	}
 	catch (const std::exception&e)
 	{
-		std::cerr << e.what() << endl << n << "! ·ÓÎ¸¯Â ˜ÂÏ " << UINT_MAX << endl;
+		std::cerr << e.what() << endl << n << "! –±–æ–ª—å—à–µ —á–µ–º " << UINT_MAX << endl;
 	}
 
 
@@ -28,7 +28,7 @@ void main()
 
 size_t Factorial(int n)
 {
-	if (n > 12) throw std::exception("¿ËÙÏÂÚË˜ÂÒÍÓÂ ÔÂÂÔÓÎÌÂÌËÂ ");
+	if (n > 12) throw std::exception("–ê—Ä–∏—Ñ–º–µ—Ç–∏—á–µ—Å–∫–æ–µ –ø–µ—Ä–µ–ø–æ–ª–Ω–µ–Ω–∏–µ ");
 	int res = 1;
 	if (n == 0) res = 1;
 	else

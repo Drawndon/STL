@@ -18,17 +18,25 @@ void main()
 	{
 	cout << n << "! = " << Factorial(n) << endl;
 	}
+	/*catch (const char* e)
+	{
+		std::cerr << e << endl;
+	}*/
+	catch (const std::runtime_error& e)
+	{
+		std::cerr << "runtime_error: ";
+		std::cerr << e.what() << endl;
+	}
 	catch (const std::exception&e)
 	{
+		std::cerr << "Exception: ";
 		std::cerr << e.what() << endl << n << "! больше чем " << UINT_MAX << endl;
 	}
-
-
 }
 
 size_t Factorial(int n)
 {
-	if (n > 12) throw std::exception("Арифметическое переполнение ");
+	if (n > 12) throw std::/*exception*/runtime_error("Арифметическое переполнение ");
 	int res = 1;
 	if (n == 0) res = 1;
 	else

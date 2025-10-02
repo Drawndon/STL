@@ -2,6 +2,8 @@
 #include<iostream>
 #include<array>
 #include<vector>
+#include<list>
+#include<forward_list>
 using std::cin;
 using std::cout;
 using std::endl;
@@ -12,6 +14,8 @@ template<typename T>void vector_info(const std::vector<T>& vec);
 
 //#define STL_ARRAY
 #define STL_VECTOR
+//#define STL_LIST
+//#define STL_FORWARD_LIST
 
 void main()
 {
@@ -87,6 +91,79 @@ void main()
 	for (int i : vec) cout << i << tab; cout << endl;
 
 #endif // STL_VECTOR
+
+#ifdef STL_LIST
+	int n = 7;
+	std::list<int> my_list;
+	std::list<int>::iterator it;
+	
+	for (int i = 0; i < n; i++)
+		my_list.push_back(rand() % 100);
+	for (int elem : my_list) cout << elem << tab; cout << endl;
+	cout << delimiter;
+	it = my_list.begin();
+	my_list.insert(it, 15);
+	for (int elem : my_list) cout << elem << tab; cout << endl;
+	cout << delimiter;
+	++it;
+	my_list.insert(it, 29);
+	for (int elem : my_list) cout << elem << tab; cout << endl;
+	cout << delimiter;
+
+
+	std::list<int>::iterator it1, it2;
+	it1 = it2 = my_list.begin();
+	advance(it2, 6);
+	++it1;
+
+	it1 = my_list.erase(it1);
+	for (int elem : my_list) cout << elem << tab; cout << endl;
+	cout << delimiter;
+
+	it2 = my_list.erase(it2);
+	for (int elem : my_list) cout << elem << tab; cout << endl;
+	cout << delimiter;
+	++it1;
+	--it2;
+	my_list.erase(it1, it2);
+	for (int elem : my_list) cout << elem << tab; cout << endl;
+	cout << delimiter;
+
+#endif // STL_LIST
+
+#ifdef STL_FORWARD_LIST
+	int n = 7;
+	std::forward_list<int> my_list(n, 77);
+;
+	for (int elem : my_list) cout << elem << tab; cout << endl;
+	cout << delimiter;
+
+	std::forward_list<int>::iterator it;
+	it = my_list.insert_after(my_list.before_begin(), 10);
+	for (int elem : my_list) cout << elem << tab; cout << endl;
+	cout << delimiter;
+	it = my_list.insert_after(it, 2, 20);
+	for (int elem : my_list) cout << elem << tab; cout << endl;
+	cout << delimiter;
+
+	it = my_list.begin();
+	it = my_list.insert_after(it, { 1, 2, 3 });
+	for (int elem : my_list) cout << elem << tab; cout << endl;
+	cout << delimiter;
+
+	it = my_list.erase_after(it);
+	for (int elem : my_list) cout << elem << tab; cout << endl;
+	cout << delimiter;
+	
+	it = my_list.begin();
+	++it;
+	it = my_list.erase_after(it);
+	for (int elem : my_list) cout << elem << tab; cout << endl;
+	cout << delimiter;
+
+#endif // STL_FORWARD_LIST
+
+
 
 
 }

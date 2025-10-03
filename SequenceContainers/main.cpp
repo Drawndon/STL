@@ -77,8 +77,8 @@ void main()
 	//vec.resize(18); //меняет фактический размер
 	for (int i : vec) cout << i << tab; cout << endl;
 	vector_info(vec);
-	cout << vec.front() << endl;
-	cout << vec.back() << endl;
+	//cout << vec.front() << endl;
+	//cout << vec.back() << endl;
 	///////////////////////////////////////////////////////////////////////////////
 	int index;
 	int value;
@@ -89,7 +89,16 @@ void main()
 	} while (index>vec.capacity());
 	vec.insert(vec.begin() + index, value);
 	for (int i : vec) cout << i << tab; cout << endl;
+	vector_info(vec);
 
+	cout << "Введите индекс удаляемого элемента: "; cin >> index;
+	vec.erase(vec.begin() + index);
+	for (int i : vec) cout << i << tab; cout << endl;
+	vector_info(vec);
+
+	vec.erase(vec.begin(), vec.begin() + index);
+	for (int i : vec) cout << i << tab; cout << endl;
+	vector_info(vec);
 #endif // STL_VECTOR
 
 #ifdef STL_LIST

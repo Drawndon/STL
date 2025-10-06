@@ -3,93 +3,107 @@
 #include<list>
 #include<fstream>
 #include<string>
+#include<locale>
 using std::cin;
 using std::cout;
 using std::endl;
 
-void show_menu();
-void print_base();
-void print_data_by_number();
-void print_data_by_range();
-void save();
-void load();
+#define delimiter "\n-----------------------------------------------------------------------------\n"
 
+
+	const std::map<int, std::string> VIOLATIONS =
+	{
+		{0, "N/A"},
+		{1, "Парковка в неположенном месте"},
+		{2, "Непристегнутый ремень безопасности"},
+		{3, "Пересечение сплошной"},
+		{4, "Превышение скорости"},
+		{5, "Проезд на красный"},
+		{6, "Выезд на встречную полосу"},
+		{7, "Езда в нетрезвом состоянии"},
+		{8, "Оскорбление офицера"}
+	};
+	class Crime
+	{
+		int violation;
+		std::string place;
+	public:
+		int get_violation()const
+		{
+			return violation;
+		}
+		const std::string& get_place()const
+		{
+			return place;
+		}
+		void set_violation(int violation)
+		{
+			this->violation = violation;
+		}
+		void set_place(const std::string& place)
+		{
+			this->place = place;
+		}
+		Crime(int violation, const std::string& place)
+		{
+			set_violation(violation);
+			set_place(place);
+		}
+
+	};
+	std::ostream& operator<<(std::ostream& os, const Crime& obj)
+	{
+		os.width(44);
+		os << std::left;
+		return os << VIOLATIONS.at(obj.get_violation()) << obj.get_place(); //Берем at(), а не [], так как константный экземпляр map
+	}
+
+	void print(const std::map<std::string, std::list<Crime>>& base);
+	void save(const std::map<std::string, std::list<Crime>>& base, const std::string& filename);
 
 void main()
 {
-	std::map<int, std::string> violation =
-	{
-		{0, "Проезд на красный"},
-		{1, "Обгон запрещен"},
-		{2, "Разворот запрещен"},
-		{3, "Превышение скорости"},
-		{4, "Остановка запрещена"},
-		{5, "Управление ТС в нетрезвом виде"},
-		{6, "Учебная езда на магистрали"},
-		{7, "Движение задним ходом на магистрали"},
-		{8, "Поворот налево или разворот в нарушение требований"}
-	};
 	setlocale(LC_ALL, "");
-	int key;
-	do
+	std::map<std::string, std::list<Crime>> base =
 	{
-		show_menu();
-	cout << "Введите пункт меню: "; cin >> key;
-	switch (key)
+		{"a777aa", {Crime(4, "ул. Ленина"), Crime(5, "ул. Ленина"), Crime(7, "ул. Энтузиастов"), Crime(8, "ул. Энтузиастов")} },
+		{"a123bb", {Crime(2, "ул. Пролетарская"), Crime(3, "ул. Ватутина")} },
+		{"a001eg", {Crime(5, "ул. Октябрьская"), Crime(5, "ул. Октябрьская"), Crime(7, "ул. Космическая"), Crime(8, "ул. Энтузиастов")} },
+	};
+	print(base);
+	save(base, "base.txt");
+
+}
+
+void print(const std::map<std::string, std::list<Crime>>& base)
+{
+	for (std::map<std::string, std::list<Crime>>::const_iterator plate = base.begin(); plate != base.end(); ++plate) //const_iterator, т.к. функция принимает const экземпляр
 	{
-	case 1:
-		print_base();
-		break;
-	case 2:
-		print_data_by_number();
-		break;
-	case 3:
-		print_data_by_range();
-		break;
-	case 4:
-		save();
-		break;
-	case 5:
-		load();
-		break;
-	case 0:
-		cout << "Пока" << endl;
+		cout << plate->first << ":\n";
+		for (std::list<Crime>::const_iterator violation = plate->second.begin(); violation != plate->second.end(); ++violation)
+		{
+			cout << "\t" << *violation << endl;
+		}
+		cout << delimiter;
 	}
-
-	} while (key);
 }
 
-void show_menu()
+void save(const std::map<std::string, std::list<Crime>>& base, const std::string&filename)
 {
-	cout << "1. Вывести базу данных (по номерам машин и списку правонарушений, числящихся за ними);" << endl;
-	cout << "2. Распечатка данных по заданному номеру;" << endl;
-	cout << "3. Распечатка данных по диапазону номеров;" << endl;
-	cout << "4. Сохранить информацию из файла." << endl;
-	cout << "5. Загрузить информацию из файла." << endl;
-	cout << "0. Выход" << endl;
-
-}
-
-void print_base()
-{
-	cout << "Print base" << endl;
-}
-
-void print_data_by_number()
-{
-	cout << "Print by number" << endl;
-}
-
-void print_data_by_range()
-{
-	cout << "Print by range" << endl;
-}
-void save()
-{
-	cout << "Saving data to file" << endl;
-}
-
-void load()
-{
-	cout << "Loading data from file" << endl;
+	std::wofstream fout(filename);
+	//std::locale utf8_locale(std::locale(), new utf8cvt<false>);
+	//fout.imbue(utf8_locale);
+	for (std::map<std::string, std::list<Crime>>::const_iterator plate = base.begin(); plate != base.end(); ++plate) //const_iterator, т.к. функция принимает const экземпляр
+	{
+		fout << plate->first << ":\n";
+		for (std::list<Crime>::const_iterator violation = plate->second.begin(); violation != plate->second.end(); ++violation)
+		{
+			fout << "\t" << *violation << endl;
+		}
+		fout << delimiter;
+	}
+	fout.close();
+	std::string cmd = "notepad ";
+	cmd += filename;
+	system(cmd.c_str());
 }

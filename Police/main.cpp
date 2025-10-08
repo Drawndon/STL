@@ -3,6 +3,7 @@
 #include<list>
 #include<fstream>
 #include<string>
+#include<sstream>
 #include<time.h>
 //#include<locale>
 using std::cin;
@@ -65,12 +66,33 @@ using std::endl;
 		return os << VIOLATIONS.at(obj.get_violation()) << obj.get_place(); //Берем at(), а не [], так как константный экземпляр map
 	}
 
+	std::ofstream& operator<<(std::ofstream& ofs, const Crime& obj)
+	{
+		ofs << obj.get_violation() << " " << obj.get_place(); //Сразу в ретёрн ошибка
+		return ofs;
+	}
+
+	std::stringstream& operator>>(std::stringstream& stream, Crime& obj)
+	{
+		int violation;
+		stream >> violation;
+		std::string place;
+		std::getline(stream, place);
+		obj.set_violation(violation);
+		obj.set_place(place);
+		return stream;
+	}
+
 	void print(const std::map<std::string, std::list<Crime>>& base);
 	void save(const std::map<std::string, std::list<Crime>>& base, const std::string& filename);
+	std::map<std::string, std::list<Crime>> load(const std::string& filename);
+
+//#define INIT_BASE
 
 void main()
 {
 	setlocale(LC_ALL, "");
+#ifdef INIT_BASE
 	std::map<std::string, std::list<Crime>> base =
 	{
 		{"a777aa", {Crime(4, "ул. Ленина"), Crime(5, "ул. Ленина"), Crime(7, "ул. Энтузиастов"), Crime(8, "ул. Энтузиастов")} },
@@ -79,7 +101,10 @@ void main()
 	};
 	print(base);
 	save(base, "base.txt");
+#endif // INIT_BASE
 
+	std::map<std::string, std::list<Crime>> base = load("base.txt");
+	print(base);
 }
 
 void print(const std::map<std::string, std::list<Crime>>& base)
@@ -102,12 +127,12 @@ void save(const std::map<std::string, std::list<Crime>>& base, const std::string
 	fout.imbue(mylocale);
 	for (std::map<std::string, std::list<Crime>>::const_iterator plate = base.begin(); plate != base.end(); ++plate) //const_iterator, т.к. функция принимает const экземпляр
 	{
-		fout << plate->first << ":\n";
+		fout << plate->first << ":";
 		for (std::list<Crime>::const_iterator violation = plate->second.begin(); violation != plate->second.end(); ++violation)
 		{
-			fout << "\t" << *violation << endl;
+			fout << *violation << ",";
 		}
-		fout << delimiter;
+		fout << endl;
 	}
 	fout.close();
 	std::string cmd = "start notepad ";
@@ -115,23 +140,39 @@ void save(const std::map<std::string, std::list<Crime>>& base, const std::string
 	system(cmd.c_str());
 }
 
-void load(std::map<std::string, std::list<Crime>>& base, const std::string& filename)
+std::map<std::string, std::list<Crime>> load(const std::string& filename)
 {
+	std::map<std::string, std::list<Crime>> base;
 	std::ifstream fin(filename);
 	if (fin.is_open())
 	{
-		std::string plate;
-		const int SIZE = 1024;
-		char CRIMES[SIZE] = {};
-		Crime crime(0, "");
 		while (!fin.eof())
 		{
-			std::getline(fin, plate, ':');
+			std::string licence_plate;
+			std::getline(fin, licence_plate, ':');
+			cout << licence_plate << "\t";
+			const int SIZE = 1024 * 500;
+			char all_crimes[SIZE];
+			fin.getline(all_crimes, SIZE);
+			cout << all_crimes << endl;
+			const char delimiters[] = ",";
+			for (char* pch = strtok(all_crimes, delimiters); pch; pch = strtok(NULL, delimiters))
+			{
+				Crime crime(0, "");
+				std::stringstream stream(pch);
+				/*stringstream – это объект, который хранит строку, но позволяет работать с ней как с потоком,
+				а именно из строки прочитать различные ее элементы используя операторы перенаправления в поток
+				и потоковую функцию getline()*/
+				stream >> crime;
+				base[licence_plate].push_back(crime);
 
+			}
 		}
 	}
 	else
 	{
-		std::cerr << "Файл не найден" << endl;
+		std::cerr << "Error: File not found" << endl;
 	}
+	fin.close();
+	return base;
 }

@@ -3,7 +3,8 @@
 #include<list>
 #include<fstream>
 #include<string>
-#include<locale>
+#include<time.h>
+//#include<locale>
 using std::cin;
 using std::cout;
 using std::endl;
@@ -23,10 +24,15 @@ using std::endl;
 		{7, "Езда в нетрезвом состоянии"},
 		{8, "Оскорбление офицера"}
 	};
+
+#define TAKE_TIME int min, int hour, int day, int month, int year
+#define GIVE_TIME min, hour, day, month, year
+
 	class Crime
 	{
 		int violation;
 		std::string place;
+		tm time;
 	public:
 		int get_violation()const
 		{
@@ -44,6 +50,7 @@ using std::endl;
 		{
 			this->place = place;
 		}
+
 		Crime(int violation, const std::string& place)
 		{
 			set_violation(violation);
@@ -90,9 +97,9 @@ void print(const std::map<std::string, std::list<Crime>>& base)
 
 void save(const std::map<std::string, std::list<Crime>>& base, const std::string&filename)
 {
-	std::wofstream fout(filename);
-	//std::locale utf8_locale(std::locale(), new utf8cvt<false>);
-	//fout.imbue(utf8_locale);
+	std::ofstream fout(filename);
+	std::locale mylocale("");
+	fout.imbue(mylocale);
 	for (std::map<std::string, std::list<Crime>>::const_iterator plate = base.begin(); plate != base.end(); ++plate) //const_iterator, т.к. функция принимает const экземпляр
 	{
 		fout << plate->first << ":\n";
@@ -103,7 +110,28 @@ void save(const std::map<std::string, std::list<Crime>>& base, const std::string
 		fout << delimiter;
 	}
 	fout.close();
-	std::string cmd = "notepad ";
+	std::string cmd = "start notepad ";
 	cmd += filename;
 	system(cmd.c_str());
+}
+
+void load(std::map<std::string, std::list<Crime>>& base, const std::string& filename)
+{
+	std::ifstream fin(filename);
+	if (fin.is_open())
+	{
+		std::string plate;
+		const int SIZE = 1024;
+		char CRIMES[SIZE] = {};
+		Crime crime(0, "");
+		while (!fin.eof())
+		{
+			std::getline(fin, plate, ':');
+
+		}
+	}
+	else
+	{
+		std::cerr << "Файл не найден" << endl;
+	}
 }

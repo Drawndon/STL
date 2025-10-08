@@ -28,7 +28,8 @@ using std::endl;
 
 #define TAKE_TIME int min, int hour, int day, int month, int year
 #define GIVE_TIME min, hour, day, month, year
-
+	class Crime;
+	std::stringstream& operator>>(std::stringstream& stream, Crime& obj);
 	class Crime
 	{
 		int violation;
@@ -56,6 +57,11 @@ using std::endl;
 		{
 			set_violation(violation);
 			set_place(place);
+		}
+		explicit Crime(const std::string& str)
+		{
+			std::stringstream stream(str);
+			stream >> *this;
 		}
 
 	};
@@ -157,15 +163,15 @@ std::map<std::string, std::list<Crime>> load(const std::string& filename)
 			cout << all_crimes << endl;
 			const char delimiters[] = ",";
 			for (char* pch = strtok(all_crimes, delimiters); pch; pch = strtok(NULL, delimiters))
+				base[licence_plate].push_back(Crime(pch)); //Написали конструктор принимающий строку
 			{
-				Crime crime(0, "");
-				std::stringstream stream(pch);
-				/*stringstream – это объект, который хранит строку, но позволяет работать с ней как с потоком,
-				а именно из строки прочитать различные ее элементы используя операторы перенаправления в поток
-				и потоковую функцию getline()*/
-				stream >> crime;
-				base[licence_plate].push_back(crime);
-
+				//Crime crime(0, "");
+				//std::stringstream stream(pch);
+				///*stringstream – это объект, который хранит строку, но позволяет работать с ней как с потоком,
+				//а именно из строки прочитать различные ее элементы используя операторы перенаправления в поток
+				//и потоковую функцию getline()*/
+				////stream >> crime;
+				//base[licence_plate].push_back(crime);
 			}
 		}
 	}

@@ -1,9 +1,10 @@
-﻿#include<iostream>
+﻿#include<Windows.h>
+#include<iostream>
 #include<map>
-#include<list>
 #include<fstream>
 #include<string>
 #include<sstream>
+#include<list>
 #include<time.h>
 //#include<locale>
 using std::cin;
@@ -26,8 +27,6 @@ using std::endl;
 		{8, "Оскорбление офицера"}
 	};
 
-#define TAKE_TIME int min, int hour, int day, int month, int year
-#define GIVE_TIME min, hour, day, month, year
 	class Crime;
 	std::stringstream& operator>>(std::stringstream& stream, Crime& obj);
 	class Crime
@@ -93,6 +92,12 @@ using std::endl;
 			set_place(place);
 			set_time(time);
 		}
+		Crime(int violation, const std::string& place, time_t time)
+		{
+			set_violation(violation);
+			set_place(place);
+			set_time(time);
+		}
 		explicit Crime(const std::string& str)
 		{
 			std::stringstream stream(str);
@@ -131,9 +136,13 @@ using std::endl;
 	void save(const std::map<std::string, std::list<Crime>>& base, const std::string& filename);
 	std::map<std::string, std::list<Crime>> load(const std::string& filename);
 
+	void add_crime(std::map<std::string, std::list<Crime>>& base);
+	void print_range(std::map<std::string, std::list<Crime>>& base);
+	void menu(std::map<std::string, std::list<Crime>>& base);
+
 //#define INIT_BASE
 //#define INIT_BASE_2
-#define LOAD_CHECK
+//#define LOAD_CHECK
 
 void main()
 {
@@ -164,6 +173,9 @@ void main()
 	std::map<std::string, std::list<Crime>> base = load("base.txt");
 	print(base);
 #endif // LOAD_CHECK
+
+	std::map<std::string, std::list<Crime>> base = load("base.txt");
+	menu(base);
 
 }
 
@@ -210,11 +222,11 @@ std::map<std::string, std::list<Crime>> load(const std::string& filename)
 		{
 			std::string licence_plate;
 			std::getline(fin, licence_plate, ':');
-			cout << licence_plate << "\t";
+			//cout << licence_plate << "\t";
 			const int SIZE = 1024 * 500;
 			char all_crimes[SIZE];
 			fin.getline(all_crimes, SIZE);
-			cout << all_crimes << endl;
+			//cout << all_crimes << endl;
 			const char delimiters[] = ",";
 			for (char* pch = strtok(all_crimes, delimiters); pch; pch = strtok(NULL, delimiters))
 				base[licence_plate].push_back(Crime(pch)); //Написали конструктор принимающий строку
@@ -235,4 +247,81 @@ std::map<std::string, std::list<Crime>> load(const std::string& filename)
 	}
 	fin.close();
 	return base;
+}
+
+void add_crime(std::map<std::string, std::list<Crime>>& base)
+{
+	std::string licence_plate;
+	std::string place;
+	cout << "Введите номер автомобиля: ";
+	SetConsoleCP(1251);
+	cin >> licence_plate;
+	SetConsoleCP(866);
+
+	cout << "Введите место происшествия: ";
+	cin.ignore();
+	cin.clear();
+	SetConsoleCP(1251);
+	std::getline(cin, place);
+	SetConsoleCP(866);
+
+	for (std::pair<int, std::string> violation : VIOLATIONS)
+	{
+		cout << violation.first << "\t" << violation.second << endl;
+	}
+	int number;
+	cout << "Введите номер статьи: "; cin >> number;
+	base[licence_plate].push_back(Crime(number, place, time(NULL)));
+}
+
+void print_range(std::map<std::string, std::list<Crime>>& base)
+{
+	std::string first, last;
+	cout << "Введите начальный номер: ";
+	SetConsoleCP(1251);
+	cin >> first;
+	SetConsoleCP(866);
+	cout << "Введите конечный номер: ";
+	SetConsoleCP(1251);
+	cin >> last;
+	SetConsoleCP(866);
+	for (
+		std::map<std::string, std::list<Crime>>::iterator plate = base.lower_bound(first);
+		plate != base.upper_bound(last);
+		++plate)
+	{
+		cout << plate->first << endl;
+		for (std::list<Crime>::iterator crime = plate->second.begin(); crime != plate->second.end(); ++crime)
+		{
+			cout << "\t" << *crime << endl;
+		}
+		cout << delimiter << endl;
+	}
+	
+}
+
+void menu(std::map<std::string, std::list<Crime>>& base)
+{
+	int var;
+	do
+	{
+	cout << "1. Полный вывод базы;" << endl;
+	cout << "2. Сохранить;" << endl;
+	cout << "3. Загрузить;" << endl;
+	cout << "4. Добавить нарушение;" << endl;
+	cout << "5. Вывод диапазона номеров;" << endl;
+	cout << "0. Выход;" << endl;
+
+		cin >> var;
+		system("CLS");
+		switch (var)
+		{
+		case 1: print(base); break;
+		case 2: save(base, "base.txt"); break;
+		case 3: base = load("base.txt"); break;
+		case 4: add_crime(base); break;
+		case 5: print_range(base); break;
+		default: std::cerr << "Error: Нажимайте пожалуйста на кнопки внимательнее!" << endl;
+		}
+	} while (var);
 }

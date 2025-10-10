@@ -51,6 +51,11 @@ using std::endl;
 			stringtime[strlen(stringtime) - 1] = 0;
 			return stringtime;
 		}
+		time_t get_timestamp()const
+		{
+			tm time_copy = time;
+			return mktime(&time_copy);
+		}
 		void set_violation(int violation)
 		{
 			this->violation = violation;
@@ -77,6 +82,10 @@ using std::endl;
 			this->time.tm_hour = parts[3];
 			this->time.tm_min = parts[4];
 		}
+		void set_time(time_t time)
+		{
+			this->time = *localtime(&time);
+		}
 
 		Crime(int violation, const std::string& place, const std::string& time)
 		{
@@ -95,12 +104,12 @@ using std::endl;
 	{
 		os.width(44);
 		os << std::left;
-		return os << obj.get_time() << VIOLATIONS.at(obj.get_violation()) << tab << obj.get_place(); //Берем at(), а не [], так как константный экземпляр map
+		return os << obj.get_time() << VIOLATIONS.at(obj.get_violation()) << obj.get_place() << " " << obj.get_timestamp(); //Берем at(), а не [], так как константный экземпляр map
 	}
 
 	std::ofstream& operator<<(std::ofstream& ofs, const Crime& obj)
 	{
-		ofs << obj.get_violation() << " " << obj.get_place() << " " << obj.get_time(); //Сразу в ретёрн ошибка
+		ofs << obj.get_violation() << " " << obj.get_timestamp() << " " << obj.get_place(); //Сразу в ретёрн ошибка
 		return ofs;
 	}
 
@@ -108,6 +117,9 @@ using std::endl;
 	{
 		int violation;
 		stream >> violation;
+		time_t time;
+		stream >> time;
+		obj.set_time(time);
 		std::string place;
 		std::getline(stream, place);
 		obj.set_violation(violation);
@@ -172,7 +184,7 @@ void save(const std::map<std::string, std::list<Crime>>& base, const std::string
 {
 	std::ofstream fout(filename);
 	std::locale mylocale("");
-	fout.imbue(mylocale);
+	///fout.imbue(mylocale);
 	for (std::map<std::string, std::list<Crime>>::const_iterator plate = base.begin(); plate != base.end(); ++plate) //const_iterator, т.к. функция принимает const экземпляр
 	{
 		fout << plate->first << ":";
